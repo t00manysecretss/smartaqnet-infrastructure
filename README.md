@@ -1,24 +1,27 @@
 Clone using `$git clone --recursive  (you need to setup ssh key at github)
 
 ## Prerequisites
-* docker-compose
-* ssh keys on DOCKER_HOST and inside ssh-agent or predeployed TLS Keys
+* docker swarm with at least one master and one worker
+* ssh access to the master
 
 ## Setup
 
-1. cd into the conf/{HOST} directory to select host: `$cd conf/smartaqnet-dev` (edit .env to use your own DOCKER_HOST or comment out if set in your shell environment Note: currently the ssh: protocol is selected however the docker-compose implementation is a bit shaky so you might want to use plain TLS)
-
-3. on first setup call `$docker -f ../docker-compose-init.yml up` to initialize the certificates
-
-4. call `$ docker-compose up -d` 
-
-5. call `$ docker-compose ps`  to confirm everything is up and running
-
-## Cleanup 
-
-1. `$ docker-compose down`
-2. `$ docker-compose up -d`
+1. Clone repository to the master machine
+2. Enter all private data into the docker-compose files for traefik, postgis and frost
+3. Start traefik with `docker stack deploy -c traefik/docker-compose.yml traefik`.
+4. Start postgis with `docker stack deploy -c postgis/docker-compose.yml postgis` and wait for the replica containers to build the inital db.
+5. Import any existsing postgis backup.
+6. Start frost with `docker stack deploy -c frost/docker-compose.yml frost`. 
 
 ## Full Cleanup loosing all data!!!!
 
-1. `$ docker-compose down -v`
+For a full cleanup every stack and its corresponding volumes needs to be removed.
+```bash
+# run this on one master node only
+docker stack rm frost
+docker stack rm postgis
+docker stack rm traefik
+# run this on every docker swarm node
+docker system prune -af
+docker volume prune -f
+```

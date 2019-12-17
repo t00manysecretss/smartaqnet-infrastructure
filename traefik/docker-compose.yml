@@ -47,7 +47,7 @@ services:
         condition: on-failure
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.middlewares.api_basicauth.basicauth.users=admin:$$apr1$$OOytxnSp$$p5QKFhXpyzeHsBfiqatAL0'
+        - 'traefik.http.middlewares.api_basicauth.basicauth.users=admin:APR1 hashed password (openssl passwd -apr1) and double every $ in it'
         - 'traefik.http.middlewares.api_basicauth.basicauth.realm=DashboardLogin'
         - 'traefik.http.middlewares.api_basicauth.basicauth.removeheader=true'
         - 'traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)'
